@@ -17,14 +17,13 @@ ui.add_head_html('''
     box-sizing: border-box;
   }
 
-  .abstract-box {
+   .abstract-box {
     width: min(100%, 900px);
     padding: clamp(1rem, 4vw, 2.5rem);
     box-sizing: border-box;
     background: white;
     border-radius: 12px;
   }
-
   .header {
     display: flex;
     justify-content: space-between;
