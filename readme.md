@@ -6,7 +6,7 @@ This work has significantly improved working conditions (and satisfaction) of st
 
 **Abstract transformation**
 
-For transforming the abstracts into something mildly entertaining, the transformer (ha, ha, ha...) model mistral 7b is used.
+For transforming the abstracts into something mildly entertaining, the transformer model mistral 7b accessed through Ollama is used. Make sure you have ollama installed on your system and have pulled `mistral:7b`. You can use any model for this, just change the model variable assignment in `dev.ipynb`.
 
 **Dashboard**
 
