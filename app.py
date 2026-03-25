@@ -1,10 +1,12 @@
-from datetime import datetime
+from datetime import datetime, time
 from nicegui import ui
+import pandas as pd
+import ast
 
-abstract_morning = """In an audacious attempt to decipher the enigma of political polarization
-that has engulfed contemporary democratic societies..."""
+data = pd.read_csv("data/clean_abstracts.csv")
 
-abstract_noon = """The escalating rift between ideological extremes within political systems..."""
+abstract_morning = data.iloc[99]
+abstract_noon = data.iloc[50]
 
 ui.add_head_html('''
 <style>
@@ -17,13 +19,14 @@ ui.add_head_html('''
     box-sizing: border-box;
   }
 
-   .abstract-box {
+  .abstract-box {
     width: min(100%, 900px);
     padding: clamp(1rem, 4vw, 2.5rem);
     box-sizing: border-box;
     background: white;
     border-radius: 12px;
   }
+
   .header {
     display: flex;
     justify-content: space-between;
@@ -43,50 +46,63 @@ ui.add_head_html('''
     white-space: nowrap;
   }
 
-  .abstract-text {
+    .abstract-box {
+    width: min(100%, 900px);
+    padding: clamp(1rem, 4vw, 2.5rem);
+    box-sizing: border-box;
+    background: white;
+    border-radius: 12px;
+
+    display: flex;
+    flex-direction: column;   /* stack vertically */
+    height: 100%;
+    }
+
+    .abstract-text {
     text-align: justify;
     line-height: 1.7;
     hyphens: auto;
     overflow-wrap: break-word;
-  }
 
-  .doi {
-    margin-top: 1.5rem;
+    flex-grow: 1;  /* pushes citation downward */
+    }
+
+    .doi {
+    margin-top: 0.5rem;
     font-size: 0.8rem;
     color: #777;
-  }
+    max-width: 70%;
+    align-self: flex; 
+    text-align: left;
+    }
 </style>
 ''')
 
 def get_text():
-    now = datetime.now()
-    current_hm = now.strftime('%H:%M')
-
-    if current_hm >= '12:35' or current_hm < '07:00':
+    now = datetime.now().time()
+    if now >= time(12, 35) or now < time(7, 0):
         return abstract_noon
-    else:
-        return abstract_morning
-
-def get_date():
-    return datetime.now().strftime('%Y-%m-%d')
+    return abstract_morning
+    
+current = get_text()
 
 with ui.element('div').classes('center-wrap'):
     with ui.element('div').classes('abstract-box'):
 
-        # Header (title left, date right)
         with ui.element('div').classes('header'):
-            ui.label('Article about bees and beans').classes('title')
-            date_label = ui.label(get_date()).classes('date')
+            title_label = ui.label().classes('title')
+            citations = ui.label().classes("date")
 
-        # Abstract
-        abstract_label = ui.markdown(get_text()).classes('abstract-text')
-
-        # DOI (bottom)
-        ui.label('DOI: 10.1234/example.doi').classes('doi')
+        abstract_label = ui.markdown().classes('abstract-text')
+        citation_block = ui.markdown().classes('doi')
+        
 
 def update_text():
-    abstract_label.set_content(get_text())
-    date_label.set_text(get_date())
+    current = get_text()
+    citations.set_text(f"Citations: {current["ref_count"]}")
+    title_label.set_text(current["title"])
+    abstract_label.set_content(current["abstract"])
+    citation_block.set_content(current["apa_citation"])
 
 ui.timer(30.0, update_text)
 
